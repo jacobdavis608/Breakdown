@@ -15,7 +15,7 @@ function App() {
         >
           Learn React
         </a>
-        <p>Welcome to Yawn Mower!</p>
+        <p>Welcome to Breakdown!</p>
       </header>
     </div>
   );
