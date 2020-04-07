@@ -2,6 +2,8 @@ import requests
 import os
 import io
 from tika import parser
+import re
+import heapq
 
 
 class PDFSummarizer():
@@ -39,7 +41,7 @@ class PDFSummarizer():
         if os.path.isfile(path):
             os.system("rm -f {0}".format(path))
 
-    def naive_summarize(self):
+    def naive_summarize(self, length=2):
         '''
         Return a summary of the abstract and of the conclusion using word weights.
         '''
@@ -55,24 +57,56 @@ class PDFSummarizer():
             
             summary_response['valid_file'] = 'y'
 
-        # Find the abstract and conclusion, store as strings
-        abstract_pos = article_raw.lower().find('abstract')
-        
-        
+        # Find the abstract, store as string
+        abs_start_pos = article_raw.lower().find('abstract')
+        abs_length = article_raw[abs_start_pos:].find('.\n\n')
+        abs_raw = article_raw[abs_start_pos:abs_start_pos+abs_length]
 
-        # Separate the paragraphs into lists
+        # Separate the paragraph into list of sentences
+        abs_sentences = abs_raw.split('.')
 
         # Remove special characters, capital letters
-
+        abs_sentences = [sentence.replace('-\n', '') for sentence in abs_sentences]
+        abs_sentences = [sentence.replace('\n', ' ') for sentence in abs_sentences]
+        
         # Tokenize sentences (get a list of all of the words in paragraph)
+        tokenized_sentences = [sentence.split(' ') for sentence in abs_sentences]
 
-        # Find weighted frequency of each work
-
+        # Find weighted frequency of each word
+        word_weights = {}
+        for sentence in tokenized_sentences:
+            for word in sentence:
+                if word in word_weights.keys():
+                    word_weights[word] += 1
+                else:
+                    word_weights[word] = 1
+        
+        max_freq = max(word_weights.values())
+        for word in word_weights.keys():
+            word_weights[word] = (word_weights[word]/max_freq)
+        
+        scores = {}
         # Calculate sentence scores (store as array)
+        for i in range(len(tokenized_sentences)):
+            score = 0
+            sentence = tokenized_sentences[i]
+            for word in sentence:
+                score += word_weights[word]
+            scores[i] = score
 
-        # Extract the highest scoring sentence from each paragraph
-
+        # Extract the highest scoring sentence
+        if length > len(tokenized_sentences):
+            length = len(tokenized_sentences)
+        sentence_indices = heapq.nlargest(length, scores, key=scores.get)
+        sentence_indices.sort()
+        
         # Return summary concatenated
+        summary_list = []
+        for index in sentence_indices:
+            summary_list.append(abs_sentences[index])
+        summary = '.'.join(summary_list)
+
+        print(summary + ".")
 
         return summary_response
 
