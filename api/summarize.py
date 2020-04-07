@@ -57,7 +57,8 @@ class PDFSummarizer():
 
         # Find the abstract and conclusion, store as strings
         abstract_pos = article_raw.lower().find('abstract')
-        print(article_raw[abstract_pos:abstract_pos+100])
+        
+        
 
         # Separate the paragraphs into lists
 

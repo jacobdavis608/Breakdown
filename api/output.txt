@@ -1,0 +1,2275 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Model-Reference Reinforcement Learning Control of Autonomous
+Surface Vehicles with Uncertainties
+
+Qingrui Zhang1,2, Wei Pan2, and Vasso Reppa1
+
+Abstract— This paper presents a novel model-reference rein-
+forcement learning control method for uncertain autonomous
+surface vehicles. The proposed control combines a conventional
+control method with deep reinforcement learning. With the
+conventional control, we can ensure the learning-based con-
+trol law provides closed-loop stability for the overall system,
+and potentially increase the sample efficiency of the deep
+reinforcement learning. With the reinforcement learning, we
+can directly learn a control law to compensate for modeling
+uncertainties. In the proposed control, a nominal system is
+employed for the design of a baseline control law using a
+conventional control approach. The nominal system also defines
+the desired performance for uncertain autonomous vehicles
+to follow. In comparison with traditional deep reinforcement
+learning methods, our proposed learning-based control can
+provide stability guarantees and better sample efficiency. We
+demonstrate the performance of the new algorithm via extensive
+simulation results.
+
+I. INTRODUCTION
+
+Autonomous surface vehicles (ASVs) have been attracting
+more and more attention, due to their advantages in many
+applications, such as environmental monitoring [1], resource
+exploration [2], shipping [3], and many more. Successful
+launch of ASVs in real life requires accurate tracking control
+along a desired trajectory [4]–[6]. However, accurate tracking
+control for ASVs is challenging, as ASVs are subject to un-
+certain nonlinear hydrodynamics and unknown environmental
+disturbances [7]. Hence, tracking control of highly uncertain
+ASVs has received extensive research attention [8]–[12].
+
+Control algorithms for uncertain systems including ASVs
+mainly lie in four categories: 1) robust control which is the
+“worst-case” design for bounded uncertainties and disturbances
+[9]; 2) adaptive control which adapts to system uncertainties
+with parameter estimations [4], [5]; 3) disturbance observer-
+based control which compensates uncertainties and distur-
+bances in terms of the observation technique [11], [13];
+and 4) reinforcement learning (RL) which learns a control
+law from data samples [12], [14]. The first three algorithms
+follow a model-based control approach, while the last one
+is data driven. Model-based control can ensure closed-loop
+stability, but a system model is indispensable. Uncertainties
+and disturbances of a system should also satisfy different
+conditions for different model-based methods. In robust
+control, uncertainties and disturbances are assumed to be
+bounded with known boundaries [15]. As a consequence,
+
+1Department of Maritime and Transport Technology, Delft University of
+Technology, Delft, the Netherlands Qingrui.Zhang@tudelft.nl;
+V.Reppa@tudelft.nl
+
+2Department of Cognitive Robotics, Delft University of Technology, Delft,
+the Netherlands Wei.Pan@tudelft.nl
+
+robust control will lead to conservative high-gain control
+laws which usually limits the control performance (i.e.,
+overshoot, settling time, and stability margins) [16]. Adaptive
+control can handle varying uncertainties with unknown
+boundaries, but system uncertainties are assumed to be linearly
+parameterized with known structure and unknown constant
+parameters [17], [18]. A valid adaptive control design also
+requires a system to be persistently excited, resulting in the
+unpleasant high-frequency oscillation behaviours in control
+actions [19]. On the other hand, disturbance observer-based
+control can adapt to both uncertainties and disturbances
+with unknown structures and without assuming systems to
+be persistently excited [13], [20]. However, we need the
+frequency information of uncertainty and disturbance signals
+when choosing proper gains for the disturbance observer-
+based control, otherwise it is highly possible to end up with
+a high-gain control law [20]. In addition, the disturbance
+observer-based control can only address matched uncertainties
+and disturbances, which act on systems through the control
+channel [18], [21]. In general, comprehensive modeling and
+analysis of systems are essential for all model-based methods.
+
+In comparison with model-based methods, RL is capable
+of learning a control law from data samples using much
+less model information [22]. Hence, it is more promising
+in controlling systems subject to massive uncertainties and
+disturbances as ASVs [12], [14], [23], [24], given the
+sufficiency and good quality of collected data. Nevertheless,
+it is challenging for model-free RL to ensure closed-loop
+stability, though some research attempts have been made
+[25]. It implies that the learned control law must be re-
+trained, once some changes happen to the environment or the
+reference trajectory (i.e. in [14], the authors conducted two
+independent training procedures for two different reference
+trajectories.). Model-based RL is possible to learn a control
+law which ensures the closed-loop stability by introducing a
+Lyapunov constraint into the objective function of the policy
+improvement according to the latest research [26]. However,
+the model-based RL with stability guarantees requires an
+admissible control law — a control law which makes the
+original system asymptotically stable — for the initialization.
+Both the Lyapunov candidate function and complete system
+dynamics are assumed to be Lipschitz continuous with known
+Lipschitz constants for the construction of the Lyapunov
+constraint. It is challenging to find the Lipschitz constant
+of an uncertain system subject to unknown environmental
+disturbances. Therefore, the introduced Lyapunov constraint
+function is restrictive, as it is established based on the worst-
+case consideration [26].
+
+ar
+X
+
+iv
+:2
+
+00
+3.
+
+13
+83
+
+9v
+1 
+
+ [
+ee
+
+ss
+.S
+
+Y
+] 
+
+ 3
+0 
+
+M
+ar
+
+ 2
+02
+
+0
+
+
+
+With the consideration of merits and limitations of existing
+RL methods, we propose a novel learning-based control
+algorithm for uncertain ASVs by combining a conventional
+control method with deep RL in this paper. The proposed
+learning-based control design, therefore, consists of two
+components: a baseline control law stabilizing a nominal
+ASV system and a deep RL control law used to compensate
+for system uncertainties and disturbances. Such a design
+method has several advantages over both conventional model-
+based methods and pure deep RL methods. First of all, in
+relation to the “model-free” feature of deep RL, we can learn
+a control law directly to compensate for uncertainties and
+disturbances without exploiting their structures, boundaries, or
+frequencies. In the new design, uncertainties and disturbances
+are not necessarily matched, as deep RL seeks a control
+law like direct adaptive control [27]. The learning process
+is performed offline using historical data and the stochastic
+gradient descent technique, so there is no need for the ASV
+system be persistently excited when the learned control law
+is implemented. Second, the overall learned control law can
+provide stability guarantees, if the baseline control law is
+able to stabilize the ASV system at least locally. Without
+introducing a restrictive Lyapunov constraint into the objective
+function of the policy improvement in RL as in [26], we can
+avoid exploiting the Lipschitz constant of the overall system
+and potentially produce less conservative results. Lastly, the
+proposed design is potentially more sample efficient than
+a RL algorithm learning from scratch – that is, fewer data
+samples are needed for the training process. In RL, a system
+learns from mistakes so a lot of trial and error is demanded.
+Fortunately, in our proposed design, the baseline control
+which can stabilize the overall system under no disturbances,
+can help to exclude unnecessary mistakes, so it provides a
+good starting point for the RL training. A similar idea is used
+in [28] for the control of quadrotors. The baseline control
+in [28] is constructed based on the full accurate model of a
+quadrotor system, but stability analysis is missing.
+
+The rest of the paper is organized as follows. In Section II,
+we present the ASV dynamics, basic concepts of reinforce-
+ment learning, and problem formulation. Section IV describes
+the proposed methodology, including deep reinforcement
+learning design, training setup, and algorithm analysis. In
+Section VI, numerical simulation results are provided to show
+the efficiency of the proposed design. Conclusion remarks
+are given in Section VII.
+
+II. PROBLEM FORMULATION
+
+The full dynamics of autonomous surface vehicles (ASVs)
+have six degrees of freedom (DOF), including three linear
+motions and three rotational motions [7]. In most scenarios,
+we are interested in controlling the horizontal dynamics of
+(ASVs) [29], [30]. We, therefore, ignore the vertical, rolling,
+and pitching motions of ASVs by default in this paper.
+
+Let x and y be the horizontal position coordinates of an
+ASV in the inertial frame and ψ the heading angle as shown
+in Figure 1. In the body frame (c.f., Figure 1), we use u and
+v to represent the linear velocities in surge (x-axis) and sway
+
+Inertial frame
+
+Fi
+gu
+
+re
+9:
+
+Ex
+pe
+
+rim
+en
+
+tal
+Se
+
+tti
+ng
+
+M
+om
+
+en
+t o
+
+f I
+ne
+
+rti
+a
+
+to
+ac
+
+qu
+ire
+
+th
+e p
+
+eri
+od
+
+ic
+tim
+
+e o
+f t
+
+he
+ve
+
+sse
+l Tc
+
+om
+. F
+
+or
+th
+
+e c
+alc
+
+ula
+tio
+
+n t
+o w
+
+ork
+th
+
+e
+
+we
+igh
+
+t o
+f t
+
+he
+ob
+
+jec
+t a
+
+nd
+its
+
+ap
+pr
+
+ox
+im
+
+ate
+loc
+
+ati
+on
+
+of
+th
+
+e c
+en
+
+ter
+of
+
+gra
+vit
+
+y m
+us
+
+t
+
+be
+kn
+
+ow
+n.
+
+Us
+ing
+
+th
+e a
+
+cq
+uir
+
+ed
+pe
+
+rio
+dic
+
+tim
+e w
+
+e u
+se
+
+for
+mu
+
+la
+14
+
+to
+co
+
+mp
+ut
+
+e t
+he
+
+mo
+me
+
+nt
+of
+
+ine
+rti
+
+a.
+
+Iz
+=
+
+Wc
+om
+⇤ T
+
+2
+co
+
+m
+⇤ L1
+
+4 ⇤
+⇡
+2
+
+�
+Wf
+
+ra
+m
+
+e
+⇤ T
+
+2
+fr
+
+am
+e
+⇤ L2
+
+4 ⇤
+⇡
+2
+
+�
+Wv
+
+es
+se
+
+l
+⇤ L
+
+2
+3
+
+Gr
+av
+
+ity
+
+(14
+)
+
+W
+ith
+
+:
+
+Wc
+om
+
+=
+W
+
+eig
+ht
+
+of
+th
+
+e v
+ess
+
+el
+an
+
+d f
+ram
+
+e c
+om
+
+bin
+ed
+
+Wf
+ra
+
+m
+e
+
+=
+W
+
+eig
+ht
+
+of
+th
+
+e f
+ram
+
+e
+
+Wv
+es
+
+se
+l
+
+=
+W
+
+eig
+ht
+
+of
+th
+
+e v
+ess
+
+el
+
+Tco
+m
+
+=
+Os
+
+cil
+lat
+
+ion
+tim
+
+e o
+f v
+
+ess
+el
+
+an
+d f
+
+ram
+e
+
+Tfr
+am
+
+e
+
+=
+Os
+
+cil
+lat
+
+ion
+tim
+
+e o
+f f
+
+ram
+e
+
+L1
+
+=
+Le
+
+ng
+th
+
+fro
+m
+
+piv
+ot
+
+ax
+is
+
+to
+co
+
+mb
+ine
+
+d C
+oG
+
+L2
+
+=
+Le
+
+ng
+th
+
+fro
+m
+
+piv
+ot
+
+ax
+is
+
+to
+fra
+
+me
+Co
+
+G
+
+L3
+
+=
+Le
+
+ng
+th
+
+fro
+m
+
+piv
+ot
+
+ax
+is
+
+to
+ve
+
+sse
+l C
+
+oG
+
+2.1
+.6
+
+Dr
+ag
+
+(sh
+ap
+
+e)
+
+In
+ord
+
+er
+for
+
+th
+e m
+
+od
+el
+
+to
+wo
+
+rk
+th
+
+e d
+rag
+
+-te
+ns
+
+or
+, ⌧d
+
+ra
+g
+, h
+
+as
+to
+
+be
+fou
+
+nd
+. T
+
+he
+dr
+
+ag
+
+of
+a v
+
+ess
+el
+
+un
+de
+
+r a
+cer
+
+tai
+n a
+
+ng
+le
+
+is
+th
+
+e r
+esu
+
+lt
+of
+
+its
+ge
+
+om
+etr
+
+ic
+sh
+
+ap
+e o
+
+f t
+he
+
+hu
+ll.
+
+th
+e d
+
+rag
+ca
+
+n b
+e f
+
+ou
+nd
+
+in
+ma
+
+ny
+wa
+
+ys
+. F
+
+or
+th
+
+is
+res
+
+ea
+rch
+
+an
+ex
+
+pe
+rim
+
+en
+t i
+
+s c
+ho
+
+sen
+
+th
+at
+
+wi
+ll
+
+pr
+ov
+
+ide
+a b
+
+ig
+set
+
+of
+da
+
+ta
+in
+
+ord
+er
+
+to
+co
+
+mp
+ut
+
+e a
+n
+
+ov
+era
+
+ll
+dr
+
+ag
+-te
+
+ns
+or
+
+for
+th
+
+e T
+ito
+
+Ne
+ri.
+
+Al
+l t
+
+he
+da
+
+ta
+is
+
+sto
+red
+
+in
+M
+
+icr
+oso
+
+ft-
+Ex
+
+cel
+. I
+
+n
+ord
+
+er
+to
+
+ca
+rry
+
+ou
+t t
+
+his
+ex
+
+pe
+rim
+
+en
+t a
+
+rig
+id
+
+ho
+op
+
+, t
+hr
+
+ee
+loa
+
+d
+cel
+
+ls,
+an
+
+ac
+cel
+
+ero
+me
+
+ter
+an
+
+d
+flu
+
+me
+
+tan
+k t
+
+ha
+t e
+
+na
+ble
+
+s w
+ate
+
+r-fl
+ow
+
+in
+on
+
+e d
+ire
+
+cti
+on
+
+is
+ne
+
+ed
+ed
+
+, s
+ee
+
+Fi
+gu
+
+re
+10
+
+.
+
+14
+
+Bo
+dy 
+
+fra
+me
+
+(x, y)
+
+ 
+
+u
+
+v
+
+YIEast
+
+XINorth XB
+
+Y
+B
+
+⌘ = [x, y, ]
+T
+
+⌫ = [u, v, r]
+T
+
+Fig. 1: Coordinate systems of an autonomous surface vehicle
+
+(y-axis), respectively. The heading angular rate is denoted by
+r. The general 3-DOF nonlinear dynamics of an ASV can
+be expressed as
+{
+
+η̇ = R (η)ν
+Mν̇ + (C (ν) +D (ν))ν +G (ν) = τ
+
+(1)
+where η = [x, y, ψ]T ∈ R3 is a generalized coordinate
+vector, ν = [u, v, r]T ∈ R3 is the speed vector, M is
+the inertia matrix, C (ν) denotes the matrix of Coriolis
+and centripetal terms, D (ν) is the damping matrix, τ ∈
+R3 represents the control forces and moments, G (ν) =
+[g1 (ν) , g2 (ν) , g3 (ν)]
+
+T ∈ R3 denotes unmodeled dynamics
+due to gravitational and buoyancy forces and moments [7],
+and R is a rotation matrix given by
+
+R =
+
+
+
+
+cosψ − sinψ 0
+sinψ cosψ 0
+
+0 0 1
+
+
+
+
+The inertia matrix M = MT > 0 is
+
+M = [Mij ] =
+
+
+
+M11 0 0
+
+0 M22 M23
+0 M32 M33
+
+
+ (2)
+
+where M11 = m−Xu̇, M22 = m−Yv̇ , M33 = Iz−Nṙ, and
+M32 = M23 = mxg − Yṙ. The matrix C (ν) = −CT (ν) is
+
+C = [Cij ] =
+
+
+
+
+0 0 C13 (ν)
+0 0 C23 (ν)
+
+−C13 (ν) −C23 (ν) 0
+
+
+ (3)
+
+where C13 (ν) = −M22v −M23r, C23 (ν) = −M11u. The
+damping matrix D (ν) is
+
+D (ν) = [Dij ] =
+
+
+
+D11 (ν) 0 0
+
+0 D22 (ν) D23 (ν)
+0 D32 (ν) D33 (ν)
+
+
+ (4)
+
+where D11 (ν) = −Xu − X|u|u|u| − Xuuuu2, D22 (ν) =
+−Yv − Y|v|v|v| − Y|r|v|r|, D23 (ν) = −Yr − Y|v|r|v| −
+Y|r|r|r|, D32 (ν) = −Nv − N|v|v|v| − N|r|v|r|, D33 (ν) =
+−Nr − N|v|r|v| − N|r|r|r|, and X(·), Y(·), and N(·) are
+hydrodynamic coefficients whose definitions can be found in
+[7]. Accurate numerical models of the nonlinear dynamics
+(1) are rarely available. Major uncertainty sources come from
+M , C (ν), and D (ν) due to hydrodynamics, and G (ν)
+due to gravitational and buoyancy forces and moments. The
+objective of this work is to design a control scheme capable
+of handling these uncertainties.
+
+
+
+with steel rods, will be attached to either side of the vessel as shown in Figure
+8. By lifting the ship by two opposed outward pointing rods, one can find the
+z-coordinate by balance. After lifting the ship will either stay motionless, or it
+will start to tilt upside down after a slight momentum is applied. If the ship
+will not tilt and eventually come to a balance in an upright position, one can
+conclude the z-component of the CoG is above the point of the rod the vessel
+was lifted with. By moving the two steel rods up or down one can test the
+location by reaching the tilting point of the Tito Neri. If the ship will tilt, and
+therefore ends upside down, the CoG is beneath the steel rods. By performing
+this experiment with a slight change in height of the beams. An assumption can
+be made in terms of the CoG. If the rods are exactly placed on the z-value of
+the CoG, the ship can be tilted and will stay in equilibrium for every position.
+
+Figure 8: Experimental setting CoG for the z-coordinate
+
+2.1.5 Moment of inertia
+
+For this experiment keep in mind the research limitation of just 3 DoF. It
+is su�cient to determine the moment of inertia about the z-axis (yaw). As
+is stated before, the e↵ects of buoyancy and rolling will be neglected in this
+research. This experimental setting has been inspired by an experiment that
+engineers at the NASA’s Armstrong Flight Research Center carried out the
+find the moment of inertia of a plane. (NASA, 2016) The experimental setting
+consists of two frames. One Large frame which is meant to keep the object in
+the air. The other frame is constructed in such a way that it will function as
+the rigid swing between the vessel and the larger frame. See section 2.1.3 for
+the construction of the frame. Note that it is important for the arm to be rigid
+otherwise the periodic time will be a↵ected by the arms ability to flex. The goal
+of this experiment is to acquire the swing time of the vessel in order to calculate
+its moment of inertia. In this experiment the time the object takes to make a
+known amount of oscillations will be measured. This will be done by counting
+the amount of complete swings in a span of time. The data will be computed
+
+13
+
+Autonomous Surface Vehicle
+
+Nominal System
+
+ub
+
+ulxr
+
+x
+
+xm
+
+RL control
+
+Baseline 
+control
+
+Baseline 
+control
+
+xm x
+
+x
+
+um ẋm =
+
+
+0 R (⌘)
+0 Am
+
+�
+xm +
+
+
+0
+
+Bm
+
+�
+um
+
+Fig. 2: Model-reference reinforcement learning control
+
+III. MODEL-REFERENCE REINFORCEMENT LEARNING
+CONTROL
+
+Let x =
+[
+ηT ,νT
+
+]T
+and u = τ , so (1) can be rewritten as
+
+ẋ =
+
+[
+0 R (η)
+0 A (ν)
+
+]
+x+
+
+[
+0
+B
+
+]
+u (5)
+
+where A (ν) = M−1 (C (ν) +D (ν)), and B = M−1.
+Assume an accurate model (5) is not available, but it is
+possible to get a nominal model expressed as
+
+ẋm =
+
+[
+0 R (η)
+0 Am
+
+]
+xm +
+
+[
+0
+Bm
+
+]
+um (6)
+
+where Am and Bm are the known system matrices. Assume
+that there exists a control law um allowing the states of the
+nominal system (6) to converge to a reference signal xr, i.e.,
+‖xm − xr‖2 → 0 as t→∞.
+
+The objective is to design a control law allowing the state
+of (5) to track state trajectories of the nominal model (6).
+As shown in Figure 2, the overall control law for the ASV
+system (5) has the following expression.
+
+u = ub + ul (7)
+
+where ub is a baseline control designed based on (6), and ul is
+a control policy from the deep reinforcement learning module
+shown in Figure 2. The baseline control ub is employed to
+ensure some basic performance, (i.e., local stability), while
+ul is introduced to compensate for all system uncertainties.
+The baseline control ub in (7) can be designed based on any
+existing model-based method based on the nominal model (6).
+Hence, we ignore the design process of ub, and mainly focus
+on the development of ul based on reinforcement learning.
+
+A. Reinforcement learning
+
+In RL, system dynamics are characterized using a
+Markov decision process denoted by a tuple MDP :=〈
+S, U , P, R, γ
+
+〉
+, where S is the state space, U specifies the
+
+action/input space, P : S × U × S → R defines a transition
+probability, R : S × U → R is a reward function, and
+γ ∈ [0, 1] is a discount factor. A policy in RL, denoted
+by π (ul|s), is the probability of choosing an action ul ∈ U
+at a state s ∈ S. Note that the state vector s contains all
+available signals affecting the reinforcement learning control
+ul. In this paper, such signals include x, xm, xr, and ub,
+where xm performs like a target state for system (5) and ub is
+a function of x and xr. Hence, we choose s = {xm,x,ub}.
+
+Reinforcement learning uses data samples, so it is assumed
+that we can sample input and state data from system (5) at
+discrete time steps. Without loss of generality, we define xt,
+ub,t, and ul,t as the ASV state, the baseline control action,
+and the control action from the reinforcement learning at the
+time step t, respectively. The state signal s at the time step t
+is, therefore, denoted by st = {xm,t,xt,ub,t}. The sample
+time step is assumed to be fixed and denoted by δt.
+
+For each state st, we define a value function Vπ (st) as
+an expected accumulated return described as
+
+Vπ =
+
+∞∑
+
+t
+
+∑
+
+ul,t
+
+π (ul,t|st)
+∑
+
+st+1
+
+Pt+1|t
+(
+Rt + γVπ(st+1)
+
+)
+(8)
+
+where Rt = R(st,ul,t) and Pt+1|t = P (st+1 |st,ul,t ). The
+action-value function (a.k.a., Q-function) is defined to be
+
+Qπ (st,ul,t) = Rt + γ
+∑
+
+st+1
+
+Pt+1|tVπ(st+1) (9)
+
+In our design, we aim to allow system (5) to track the nominal
+system (6), so Rt is defined as
+
+Rt = − (xt − xm,t)T G (xt − xm,t)− uTl,tHul,t (10)
+where G ≥ 0 and H > 0 are positive definite matrices.
+
+The objective of the reinforcement learning is to find an
+optimal policy π∗ to maximize the state-value function Vπ(st)
+or the action-value function Qπ (st, ul,t), ∀st ∈ S , namely,
+
+π∗ = arg max
+π
+
+Qπ (st,ul,t)
+
+= arg max
+π
+
+
+Rt + γ
+
+∑
+
+st+1
+
+Pt+1|tVπ(st+1)
+
+
+ (11)
+
+IV. DEEP REINFORCEMENT LEARNING CONTROL DESIGN
+In this section, we will present a deep reinforcement
+
+learning algorithm for the design of ul in (7), where both
+the control law ul and the Q-function Qπ (st,ul,t) are
+approximated using deep neural networks.
+
+The deep reinforcement learning control in this paper is
+developed based on the soft actor-critic (SAC) algorithm
+which provides both sample efficient learning and convergence
+[31]. In SAC, an entropy term is added to the objective
+function in (11) to regulate the exploration performance at
+the training stage. The objective of (11) is thus rewritten as
+
+π∗ = arg max
+π
+
+(
+Rt + γEst+1 [Vπ(st+1)
+
++αH (π (ul,t+1|st+1))]
+)
+
+(12)
+
+where Est+1 [·] =
+∑
+st+1
+Pt+1|t [·] is an expectation opera-
+
+tor, H (π (ul,t|st)) = −
+∑
+ul,t
+
+π (ul,t|st) ln (π (ul,t|st)) =
+−Eπ [ln (π (ul,t|st))] is the entropy of the policy, and α is
+a temperature parameter.
+
+Training of SAC repeatedly executes policy evaluation and
+policy improvement. In the policy evaluation, a soft Q-value
+is computed by applying a Bellman operation Qπ (st,ul,t) =
+T πQπ (st,ul,t) where
+T πQπ (st,ul,t) = Rt + γEst+1 {Eπ [Qπ (st+1,ul,t+1)
+
+−α ln (π (ul,t+1|st+1))]} (13)
+
+
+
+Input layer Hidden layers Output layer
+
+Actor neural 
+
+network
+
+st
+πφ (ul,t|st)
+
+State
+
+State
+
+Input layer Hidden layers Output layer
+
+Critic neural 
+
+network
+
+Input
+
+st
+
+ul,t
+
+Qθ (st, ul,t)
+
+Fig. 3: Approximation of Qθ and πφ using MLP
+
+In the policy improvement, the policy is updated by
+
+πnew = arg min
+π′
+
+DKL
+(
+π′ (·|st)
+
+∥∥∥ZπoldeQ
+πold (st,·)
+
+)
+(14)
+
+where πold denotes the policy from the last update, Qπold
+is the Q-value of πold. DKL denotes the Kullback-Leibler
+(KL) divergence, and Zπold is a normalization factor. Via
+mathematical manipulations, the objective for the policy
+improvement is transformed into
+
+π∗ = arg min
+π
+
+Eπ
+[
+α ln (π (ul,t|st))−Q (st,ul,t)
+
+]
+(15)
+
+More details on how (15) is obtained can be found in [31],
+[32]. As shown in Figure 3, both the policy π (ul,t|st) and
+value function Qπ (st,ul,t) will be parameterized using fully
+connected multiple layer perceptrons (MLP) with ’ReLU’
+nonlinearities as the activation functions. The ’ReLU’ function
+is defined as
+
+relu (z) = max {z, 0}
+
+The “ReLU” activation function outperforms other acti-
+vation functions like sigmoid functions [33]. For a vec-
+tor z = [z1, . . . , zn]T ∈ Rn, there exists relu (z) =
+[relu (z1) , . . . , relu (zn)]
+
+T . Hence, a MLP with ’ReLU’ as
+the activation functions and one hidden layer is expressed as
+
+MLP (z) = W1
+
+[
+relu
+
+(
+W0
+[
+zT , 1
+
+])T
+, 1
+]T
+
+where
+[
+zT , 1
+
+]T
+is a vector composed of z and 1, and W0
+
+and W1 with appropriate dimensions are weight matrices to
+be trained. For the simplicity, we use W = {W0, W1} to
+represent the set of parameters to be trained.
+
+System
+Actor neural 
+
+network
+
+Critic neural 
+network
+
+Reward
+
+Run the system using latest learned control policy and collect data
+
+Update critic and actor neural networks using historical data
+Replay memory
+
+Randomly sample a 
+batch of data samples
+
+⇠
+Exploration noise
+
+input state
+
+Fig. 4: Offline training process of deep reinforcement learning
+
+In this paper, the Q-function is parameterized using θ
+and denoted by Qθ (st,ul,t). The parameterized policy is
+denoted by πφ (ul,t|st), where φ is the parameter set to be
+trained. Note that both θ and φ are a set of parameters whose
+dimensions are determined by the deep neural network setup.
+For example, if Qθ is represented by a MLP with K hidden
+layers and L neurons for each hidden layers, the parameter
+set θ is θ = {θ0, θ1, . . . , θK} with θ0 ∈ R(dims+dimu+1)×L,
+θK ∈ R(L+1), and θi ∈ R1×(L)×(L+1) for 1 ≤ i ≤ K − 1,
+where dims denotes the dimension of the state s and dimu
+is the dimension of the input ul. The deep neural network
+for Qθ is called critic, while the one for πφ is called actor.
+
+A. Training setup
+
+The algorithm training process is illustrated in Figure 4.
+The whole training process will be offline. We repeatedly
+run the system (5) under a trajectory tracking task. At each
+time step t + 1, we collect data samples, such as an input
+from the last time step ul,t, a state from the last time step
+st, a reward Rt, and a current state st+1. Those historical
+data will be stored as a tuple (st,ul,t, Rt, st+1) at a replay
+memory D [34]. At each policy evaluation or improvement
+step, we randomly sample a batch of historical data, B, from
+the replay memory D for the training of the parameters θ
+and φ. Starting the training, we apply the baseline control
+policy ub to an ASV system to collect the initial data D0 as
+shown in Algorithm 1. The initial data set D0 is used for the
+initial fitting of Q-value functions. When the initialization is
+over, we execute both ub and the latest updated reinforcement
+learning policy πφ (ul,t|st) to run the ASV system.
+
+At the policy evaluation step, the parameters θ are trained
+to minimize the following Bellman residual.
+
+JQ (θ) = E(st,ul,t)∼D
+[
+
+1
+
+2
+(Qθ (st,ul,t)− Ytarget)2
+
+]
+(16)
+
+where (st,ul,t) ∼ D implies that we randomly pick data
+samples (st,ul,t) from a replay memory D, and
+
+Ytarget = Rt + γEst+1
+[
+Eπ [Qθ̄ (st+1,ul,t+1)− α ln (πφ)]
+
+]
+
+where θ̄ is the target parameter which will be updated slowly.
+Applying a stochastic gradient descent technique (ADAM
+
+
+
+Algorithm 1 Reinforcement learning control
+1: Initialize parameters θ1, θ2 for Qθ1 and Qθ2 , respectively,
+
+and φ for the actor network (18).
+2: Assign values to the the target parameters θ̄1 ← θ1,
+θ̄2 ← θ2, D ← ∅, D0 ← ∅,
+
+3: Get data set D0 by running ub on (5) with ul = 0
+4: Turn off the exploration and train initial critic parameters
+θ01 , θ
+
+0
+2 using D0 according to (16).
+
+5: Initialize the replay memory D ← D0
+6: Assign initial values to critic parameters θ1 ← θ01 , θ2 ←
+θ02 and their targets θ̄1 ← θ01 , θ̄2 ← θ02
+
+7: repeat
+8: for each data collection step do
+9: Choose an action ul,t according to πφ (ul,t|st)
+
+10: Run both the nominal system (6) and the full system
+(5) & collect st+1 = {xt+1,xm,t+1,ub,t+1}
+
+11: D ← D
+⋃
+{st,ul,t, R (st,ul,t) , st+1}
+
+12: end for
+13: for each gradient update step do
+14: Sample a batch of data B from D
+15: θj ← θj − ιQ∇θJQ (θj), and j = 1, 2
+16: φ← φ− ιπ∇φJπ (φ),
+17: α← α− ια∇αJα (α)
+18: θ̄j ← κθj + (1− κ) θ̄j , and j = 1, 2
+19: end for
+20: until convergence (i.e. JQ (θ) < a small threshold)
+
+[35] in this paper) to (16) on a data batch B with a fixed
+size, we obtain
+
+∇θJQ (θ) =
+∑ ∇θQθ
+
+|B|
+(
+Qθ (st,ul,t)− Ytarget
+
+)
+
+where |B| is the batch size.
+At the policy improvement step, the objective function
+
+defined in (15) is represented using data samples from the
+replay memory D as given in (17).
+
+Jπ (φ) = E(st,ul,t)∼D
+(
+α ln(πφ)−Qθ (st,ul,t)
+
+)
+(17)
+
+Parameter φ is trained to minimize (17) using a stochastic
+gradient descent technique. At the training stage, the actor
+neural network is expressed as
+
+ul,φ = ūl,φ + σφ � ξ (18)
+
+where ūl,φ represents the control law to be implemented in
+the end, σφ denotes the standard deviation of the exploration
+noise, ξ ∼ N (0, I) is the exploration noise with N (0, I)
+denoting a Gaussian distribution, and “�” is the Hadamard
+product. Note that the exploration noise ξ is only applied to
+the training stage. Once the training is done, we only need
+ūl,φ in the implementation. Hence, at the training stage, ul
+in Figure 2 is equal to ul,φ. Once the training is over, we
+have ul = ūl,φ.
+
+Applying the policy gradient technique to (17), we can
+calculate the gradient of Jπ (φ) with respect to φ in terms
+
+Algorithm 2 Policy iteration technique
+1: Start from an initial control policy u0
+2: repeat
+3: for Policy evaluation do
+4: Under a fixed policy ul, apply the Bellman backup
+
+operator T π to the Q value function, Q (st,ul,t) =
+T πQ (st,ul,t) (c.f., (13))
+
+5: end for
+6: for Policy improvement do
+7: Update policy π according to (12)
+8: end for
+9: until convergence
+
+of the stochastic gradient method as in (19)
+
+∇φJπ =
+∑ α∇φ lnπφ + (α∇ul lnπφ −∇ulQθ)∇φul,φ
+
+|B|
+(19)
+
+The temperature parameters α are updated by minimizing the
+following objective function.
+
+Jα = Eπ
+[
+−α lnπ (ul,t|st)− αH̄
+
+]
+(20)
+
+where H̄ is a target entropy. Following the same setting in
+[32], we choose H̄ = −3 where “3” here represents the
+action dimension. In the final implementation, we use two
+critics which are parameterized by θ1 and θ2, respectively.
+The two critics are introduced to reduce the over-estimation
+issue in the training of critic neural networks [36]. Under the
+two-critic mechanism, the target value Ytarget is
+
+Ytarget = Rt + γmin
+{
+Qθ̄1 (st+1,ul,t+1) ,
+
+Qθ̄2 (st+1,ul,t+1)
+}
+− γα ln (πφ) (21)
+
+The entire algorithm is summarized in Algorithm 1. In
+Algorithm 1, ιQ, ιπ, and ια are positive learning rates
+(scalars), and κ > 0 is a constant scalar.
+
+V. PERFORMANCE ANALYSIS
+
+In this subsection, both the convergence and stability of the
+proposed learning-based control are analyzed. For the analysis,
+the soft actor-critic RL method in Algorithm 1 is recapped
+as a policy iteration (PI) technique which is summarized in
+Algorithm 2. We thereafter present the following two lemmas
+without proofs for the convergence analysis [31], [32].
+
+Lemma 1 (Policy evaluation): Let T π be the Bellman
+backup operator under a fixed policy π and Qk+1 (s,ul) =
+T πQk (s,ul). The sequence Qk+1 (s,ul) will converge to
+the soft Q-function Qπ of the policy π as k →∞.
+
+Lemma 2 (Policy improvement): Let πold be an old policy
+and πnew be a new policy obtained according to (14). There
+exists Qπnew (s,ul) ≥ Qπold (s,ul) ∀s ∈ S and ∀u ∈ U .
+
+In terms of (1) and (2), we are ready to present Theorem
+1 to show the convergence of the SAC algorithm.
+
+Theorem 1 (Convergence): If one repeatedly applies the
+policy evaluation and policy improvement steps to any control
+policy π, the control policy π will converge to an optimal
+
+
+
+policy π∗ such that Qπ
+∗
+
+(s,ul) ≥ Qπ (s,ul) ∀π ∈ Π, ∀s ∈
+S, and ∀u ∈ U , where Π denotes a policy set.
+
+Proof: Let πi be the policy obtained from the i-th policy
+improvement with i = 0, 1, . . ., ∞. According to Lemma
+2, one has Qπi (s,ul) ≥ Qπi−1 (s,ul), so Qπi (s,ul) is
+monotonically non-decreasing with respect to the policy
+iteration step i. In addition, Qπi (s,ul) is upper bounded
+according to the definition of the reward given in (10), so
+Qπi (s,ul) will converge to an upper limit Qπ
+
+∗
+(s,ul) with
+
+Qπ
+∗
+
+(s,ul) ≥ Qπ (s,ul) ∀π ∈ Π, ∀s ∈ S, and ∀ul ∈ U .
+
+Theorem 1 demonstrates that we can find an optimal policy
+by repeating the policy evaluation and improvement processes.
+Next, we will show the closed-loop stability of the overall
+control law (baseline control ub plus the learned control ul).
+The following assumption is made for the baseline control
+developed using the nominal system (6).
+
+Assumption 1: The baseline control law ub can ensure that
+the overall uncertain ASV system is stable – that is, there
+exists a Lyapunov function V (st) associate with ub such
+that V (st+1)− V (st) ≤ 0 ∀st ∈ S.
+Note that the baseline control ub is implicitly included in the
+state vector s, as s consists of x, xm, and ub in this paper
+as discussed in Section III. Hence, V (st) in Assumption 1
+is the Lyapunov function for the closed-loop system of (5)
+with the baseline control ub.
+
+Assumption 1 is possible in real world. One could treat
+the nominal model (6) as a linearized model of the overall
+ASV system (5) around a certain equilibrium. Therefore, a
+control law, which ensures asymptotic stability for (6), can
+ensure at least local stability for (5) [37]. In the stability
+analysis, we will ignore the entropy term H (π), as it will
+converge to zero in the end and it is only introduced to regulate
+the exploration magnitude. Now, we present Theorem 2 to
+demonstrate the closed-loop stability of the ASV system (5)
+under the composite control law (7).
+
+Theorem 2 (Stability): Suppose Assumption 1 holds. The
+overall control law ui = ub + uil can always stabilize the
+ASV system (5), where uil represents the RL control law
+from i-th iteration, and i = 0, 1, 2, ... ∞.
+
+Proof: In our proposed algorithm, we start the train-
+ing/learning using the baseline control law ub. According
+to Lemma 1, we are able to obtain the corresponding Q
+value function for the baseline control law ub. Let the Q
+value function be Q0 (s,ul) where ul is a function of s.
+According to the definitions of the reward function in (10)
+and Q value function in (9), we can choose the Lyapunov
+function candidate as V0 (s) = −Q0 (s,ul). If Assumption
+1 holds, there exists V0 (st+1)− V0 (st) ≤ 0 ∀st ∈ S.
+
+In the policy improvement, the control law is updated by
+
+u1 = min
+π
+
+(
+−Rt + γV0 (st+1)
+
+)
+(22)
+
+where the expectation operator is ignored as the system is
+deterministic. For any nonlinear system st+1 = f (st) +
+g (st)ut, a necessary condition for the existence of (22) is
+
+u1 = −1
+2
+H−1g (st)
+
+T ∂V0 (st+1)
+∂st+1
+
+(23)
+
+Substituting (23) back into (22 yields
+
+V0 (st+1)− V0 (st) = − (xt − xm,t)T G (xt − xm,t)
+
+−1
+4
+
+(
+∂V0 (st+1)
+∂st+1
+
+)T
+g (st)
+
+×H−1g (st)T
+∂V0 (st+1)
+∂st+1
+
+≤ 0
+
+Hence, u1 is a control law which can stabilize the same ASV
+system (5), if Assumption 1 holds. Applying Lemma 1 to u1,
+we can get a new Lyapunov function V1 (st). In terms of
+V1 (st), (22) and (23), we can show that u2 also stabilizes
+the ASV system (5). Repeating (22) and (23) for all i = 1, 2,
+. . ., we can prove that all ui can stabilize the ASV system
+(5), if Assumption 1 holds.
+
+VI. SIMULATION
+
+In this section, the proposed learning-based control algo-
+rithm is implemented to the trajectory tracking control of a
+supply ship model presented in [29], [30]. Model parameters
+are summarized in Table I. The unmodeled dynamics in
+the simulations are given by g1 = 0.279uv2 + 0.342v2r,
+g2 = 0.912u
+
+2v, and g3 = 0.156ur2+0.278urv3, respectively.
+The based-line control law ub is designed based on a nominal
+model with the following simplified linear dynamics in terms
+of the backstepping control method [13], [37].
+
+Mmν̇m = τ −Dmνm (24)
+where Mm = diag {M11, M22, M33}. Dm =
+diag {−Xv,−Yv, −Nr}. The reference signal is assumed
+to be produced by the following motion planner.
+
+η̇r = R (ηr)νr ν̇r = ar (25)
+
+where ηr = [xr, yr, ψr]
+T is the generalized reference position
+
+vector, νr = [ur, 0, rr]
+T is the generalized reference velocity
+
+vector, and ar = [u̇r, 0, ṙr]
+T . In the simulation, the initial
+
+position vector ηr (0) is chosen to be ηr (0) =
+[
+0, 0, π
+
+4
+
+]T
+,
+
+and we set ur (0) = 0.4 m/s and rr (0) = 0 rad/s. The
+reference acceleration u̇r and angular rates are chosen to be
+
+u̇r =
+
+{
+0.005 m/s2 if t < 20 s
+0 m/s2 otherwise
+
+(26)
+
+ṙr =
+
+{
+π
+
+600
+rad/s2 if 25 s ≤ t < 50 s
+
+0 rad/s2 otherwise
+(27)
+
+TABLE I: Model parameters
+Parameters Values Parameters Values
+
+m 23.8 Yṙ −0.0
+Iz 1.76 Yr 0.1079
+xg 0.046 Y|v|r −0.845
+Xu̇ −2.0 Y|r|r −3.45
+Xu −0.7225 Nv −0.1052
+X|u|u −1.3274 N|v|v 5.0437
+Xuuu −1.8664 N|r|v −0.13
+Yv̇ −10.0 Nṙ −1.0
+Yv −0.8612 Nr −1.9
+Y|v|v −36.2823 N|v|r 0.08
+Y|r|v −0.805 N|r|r −0.75
+
+
+
+TABLE II: Reinforcement learning configurations
+Parameters Values
+
+Learning rate ιQ 0.001
+Learning rate ιπ 0.0001
+Learning rate ια 0.0001
+
+κ 0.01
+actor neural network fully connected with two hidden layers
+
+(128 neurons per hidden layer)
+critic neural networks fully connected with two hidden layers
+
+(128 neurons per hidden layer)
+Replay memory capacity 1× 106
+
+Sample batch size 128
+γ 0.998
+
+Training episodes 1001
+Steps per episode 1000
+time step size δt 0.1
+
+Fig. 5: Learning curves of two RL algorithms at training (One
+episode is a training trial, and 1000 time steps per episode)
+
+At the training stage, we uniformly randomly sample x (0)
+and y (0) from (−1.5, 1.5), ψ (0) from (0.1π, 0.4π) and u (0)
+from (0.2, 0.4), and we choose v (0) = 0 and r (0) = 0. The
+proposed control algorithm is compared with two benchmark
+designs: the baseline control u0 and the RL control without
+u0. Configurations for the training and neural networks are
+found in Table II. The matrix G and H are chosen to be
+G = diag {0.025, 0.025, 0.0016, 0.005, 0.001, 0} and H =
+diag
+
+{
+1.25e−4, 1.25e−4, 8.3e−5
+
+}
+, respectively.
+
+At the training stage, we run the ASV system for 100 s,
+and the repeat the training processes for 1000 times (i.e., 1000
+episodes). Figure 5 shows the learning curves of the proposed
+algorithm (red) and the RL algorithm without baseline control
+(blue). The learning curves demonstrate that both of the two
+algorithms will converge in terms of the long term returns.
+However, our proposed algorithm results in a larger return
+(red) in comparison with the RL without baseline control
+(blue). Hence, the introduction of the baseline control helps to
+increase the sample efficiency significantly, as the proposed
+algorithm (blue) converges faster to a higher return value.
+
+At the first evaluation stage, we run the ASV system for
+200 s to demonstrate whether the control law can ensure
+stable trajectory tracking. Note that we run the ASV for 100
+s at training. The trajectory tracking performance of the three
+algorithms (our proposed algorithm, the baseline control u0,
+and only RL control) is shown in Figures 6. As observed
+from Figure 6.b, the control law learned merely using deep
+
+RL fails to ensure stable tracking performance. It implies
+that only deep RL cannot ensure the closed-loop stability. In
+addition, the baseline control itself fails to achieve acceptable
+tracking performance mainly due to the existence of system
+uncertainties. By combining the baseline control and deep RL,
+the trajectory tracking performance is improved dramatically,
+and the closed-loop stability is also ensured. The position
+tracking errors are summarized in Figure 7 and 8. Figure
+9 shows the absolute distance errors used to compare the
+tracking accuracy of the three algorithms. The introduction of
+the deep RL increases the tracking performance substantially.
+
+At the second evaluation, we still run the ASV system for
+200 s, but change the reference trajectory. Note that we use
+the same learned control laws in both the first and the second
+evaluations. In the second evaluation, the reference angular
+acceleration is changed to
+
+ṙr =
+
+
+
+
+
+π
+600
+
+rad/s2 if 25 s ≤ t < 50 s
+− π
+
+600
+rad/s2 if 125 s ≤ t < 150 s
+
+0 rad/s2 otherwise
+(28)
+
+The trajectory tracking results are illustrated in Figure 10.
+Apparently, the proposed control algorithm can ensure closed-
+loop stability, while the vanilla RL fails to do so. A better
+tracking performance is obtained by the proposed control law
+in comparison with only baseline control.
+
+VII. CONCLUSIONS
+
+In this paper, we presented a novel learning-based algorithm
+for the control of uncertain ASV systems by combining a
+conventional control method with deep reinforcement learning.
+With the conventional control, we ensured the overall closed-
+loop stability of the learning-based control and increase the
+sample efficiency of the deep RL. With the deep RL, we
+learned to compensate for the model uncertainties, and thus
+increased the trajectory tracking performance. In the future
+works, we will extend the results with the consideration of
+environmental disturbances. The theoretical results will be
+further verified via experiments instead of simulations. Sample
+efficiency of the proposed algorithm will also be analyzed.
+
+REFERENCES
+
+[1] D. O.B.Jones, A. R.Gates, V. A.I.Huvenne, A. B.Phillips, and B. J.Bett,
+“Autonomous marine environmental monitoring: Application in de-
+commissioned oil fields,” Science of The Total Environment, vol. 668,
+no. 10, pp. 835– 853, 2019.
+
+[2] J. Majohr and T. Buch, Advances in Unmanned Marine Vehicles.
+Institution of Engineering and Technology, 2006, ch. Modelling,
+simulation and control of an autonomous surface marine vehicle for
+surveying applications Measuring Dolphin MESSIN.
+
+[3] O. Levander, “Autonomous ships on the high seas,” IEEE Spectrum,
+vol. 54, no. 2, pp. 26 – 31, 2017.
+
+[4] K. Do, Z. Jiang, and J. Pan, “Robust adaptive path following of
+underactuated ships,” Autonomous Agents and Multi-Agent Systems,
+vol. 40, no. 6, pp. 929 – 944, Nov. 2004.
+
+[5] K. Do and J. Pan, “Global robust adaptive path following of under-
+actuated ships,” Automatica, vol. 42, no. 10, pp. 1713 – 1722, Oct.
+2006.
+
+[6] C. R. Sonnenburg and C. A. Woolsey, “Integrated optimal formation
+control of multiple unmanned aerial vehicles,” Journal of Field Robotics,
+vol. 3, no. 30, pp. 371 – 398, May/Jun. 2013.
+
+
+
+(a) Model reference reinforcement learning control (b) Only deep reinforcement learning (c) Only baseline control
+
+Fig. 6: Trajectory tracking results of the three algorithms (The first evaluation)
+
+Fig. 7: Position tracking errors (ex)
+
+Fig. 8: Position tracking errors (ey)
+
+Fig. 9: Mean absolute distance errors (
+√
+e2x + e
+
+2
+y)
+
+[7] T. I. Fossen, Handbook of Marine Craft Hydrodynamics and Motion
+Control. John Wiley & Sons, Inc., 2011.
+
+[8] R. A. Soltan, H. Ashrafiuon, and K. R. Muske, “State-dependent
+trajectory planning and tracking control of unmanned surface vessels,”
+in Proceedings of 2009 American Control Conference. St. Louis, MO,
+USA: IEEE, Jun. 2009.
+
+[9] R. Yu, Q. Zhu, G. Xia, and Z. Liu, “Sliding mode tracking control of
+an underactuated surface vessel,” IET Control Theory & Applications,
+vol. 6, no. 3, pp. 461 – 466, 2012.
+
+[10] N. Wang, J.-C. Sun, M. J. Er, and Y.-C. Liu, “A novel extreme learning
+control framework of unmanned surface vehicles,” IEEE Transactions
+on Cybernetics, vol. 46, no. 5, pp. 1106 – 1117, May 2016.
+
+[11] N. Wang, S. Lv, W. Zhang, Z. Liu, and M. J. Er, “Finite-time observer
+based accurate tracking control of a marine vehicle with complex
+unknowns,” arXiv preprint arXiv:1711.00832, vol. 145, no. 15, pp. 406
+– 415, 2017.
+
+[12] J. Woo, C. Yu, and N. Kim, “Deep reinforcement learning-based
+controller for path following of an unmanned surface vehicle,” Ocean
+Engineering, vol. 183, no. 1, pp. 155 – 166, Dec. 2019.
+
+[13] Q. Zhang and H. H. Liu, “UDE-based robust command filtered
+backstepping control for close formation flight,” IEEE Transactions
+on Industrial Electronics, vol. 65, no. 11, pp. 8818–8827, Nov. 2018,
+early access online, March 12, 2018.
+
+[14] W. Shi, S. Song, C. Wu, and C. L. P. Chen, “Multi pseudo q-learning-
+based deterministic policy gradient for tracking control of autonomous
+underwater vehicles,” IEEE Transactions on Neural Networks and
+Learning Systems, vol. 30, no. 12, pp. 3534 – 3546, Dec. 2019.
+
+[15] T. Shen and K. Tamura, “Robust h∞ control of uncertain nonlinear
+system via state feedback,” IEEE Transactions on Automatic Control,
+vol. 40, no. 4, pp. 766 – 768, Apr. 1995.
+
+[16] X. Liu, H. Su, B. Yao, and J. Chu, “Adaptive robust control of a class
+of uncertain nonlinear systems with unknown sinusoidal disturbances,”
+in Proceedings of 2008 47th IEEE Conference on Decision and Control.
+Cancun, Mexico, USA: IEEE, Dec. 2008.
+
+[17] W. M. Haddad and T. Hayakawa, “Direct adaptive control for non-
+linear uncertain systems with exogenous disturbances,” International
+Journal of Adaptive Control and Signal Processing, vol. 16, no. 2, pp.
+151 – 172, Feb. 2002.
+
+[18] Q. Zhang and H. H. Liu, “Aerodynamic model-based robust adaptive
+control for close formation flight,” Aerospace Science and Technology,
+vol. 79, pp. 5 – 16, 2018.
+
+[19] P. A. Ioannou and J. Sun, Robust Adaptive Control. Prentice-Hall,
+Inc., 1996.
+
+[20] B. Zhu, Q. Zhang, and H. H. Liu, “Design and experimental evaluation
+of robust motion synchronization control for multivehicle system
+without velocity measurements,” International Journal of Robust and
+Nonlinear Control, vol. 28, no. 7, pp. 5437 – 5463, 2018.
+
+[21] S. Mondal and hitralekha Mahanta, “Chattering free adaptive multivari-
+able sliding mode controller for systems with matched and mismatched
+uncertainty,” ISA Transactions, vol. 52, pp. 335 – 341, 2013.
+
+
+
+(a) Model reference reinforcement learning control (b) Only deep reinforcement learning (c) Only baseline control
+
+Fig. 10: Trajectory tracking results of the three algorithms (The second evaluation)
+
+[22] R. S. Sutton and A. G. Barto, Reinforcement Learning: An Introductions,
+2nd ed. The MIT Press, 2018.
+
+[23] E. Meyer, H. Robinson, A. Rasheed, and O. San, “Taming an
+autonomous surface vehicle for path following and collision avoidance
+using deep reinforcement learning,” arXiv preprint arXiv:1912.08578,
+2019.
+
+[24] X. Zhou, P. Wu, H. Zhang, W. Guo, and Y. Liu, “Learn to navigate:
+Cooperative path planning for unmanned surface vehicles using deep
+reinforcement learning,” IEEE Access, vol. 7, pp. 165 262 – 165 278,
+Nov. 2019.
+
+[25] M. Han, Y. Tian, L. Zhang, J. Wang, and W. Pan, “H∞ model-free
+reinforcement learning with robust stability guarantee,” arXiv preprint
+arXiv:1911.02875, 2019.
+
+[26] F. Berkenkamp, M. Turchetta, A. Schoellig, and A. Krause, “Safe model-
+based reinforcement learning with stability guarantees,” in Proceedings
+of the 31st International Conference on Neural Information Processing
+Systems (NIPS 2017), Long Beach, CA, USA, Dec. 2017, p. 908919.
+
+[27] R. Sutton, A. Barto, and R. Williams, “Reinforcement learning is direct
+adaptive optimal control,” IEEE Control Systems Magazine, vol. 12,
+no. 2, pp. 19 – 22, Apr. 1992.
+
+[28] J. Hwangbo, I. Sa, R. Siegwart, and M. Hutter, “Control of a quadrotor
+with reinforcement learning,” IEEE Robotics and Automation Letters,
+vol. 2, no. 4, pp. 2096 – 2103, Oct. 2017.
+
+[29] R. Skjetne, T. I. Fossen, and P. V. Kokotović, “Adaptive maneuvering,
+with experiments, for a model ship in a marine control laboratory,”
+Mathematics of Operations Research, vol. 41, pp. 289 – 298, 2005.
+
+[30] Z. Peng, D. Wang, T. Li, and Z. Wu, “Leaderless and leader-follower
+cooperative control of multiple marine surface vehicles with unknown
+dynamics,” Nonlinear Dynamics, vol. 74, pp. 95 – 106, 2013.
+
+[31] T. Haarnoja, A. Zhou, P. Abbeel, and S. Levine, “Soft actor-critic: Off-
+policy maximum entropy deep reinforcement learning with a stochastic
+actor,” arXiv preprint arXiv:1801.01290, 2018.
+
+[32] T. Haarnoja, K. H. Aurick Zhou, G. Tucker, S. Ha, J. Tan, V. Kumar,
+H. Zhu, A. Gupta, P. Abbeel, and S. Levine, “Soft actor-critic algorithms
+and applications,” arXiv preprint arXiv:1812.05905, 2018.
+
+[33] G. E. Dahl, T. N. Sainath, and G. E. Hinton, “Improving deep
+neural networks for lvcsr using rectified linear units and dropout,”
+in Proceedings of 2013 IEEE International Conference on Acoustics,
+Speech and Signal Processing, Vancouver, BC, Canada, May 2013.
+
+[34] V. Mnih, K. Kavukcuoglu, D. Silver, A. A. Rusu, J. Veness, M. G.
+Bellemare, A. Graves, M. Riedmiller, A. K. Fidjeland, G. Ostrovski,
+C. B. Stig Petersen, A. Sadik, I. Antonoglou, H. King, D. Kumaran,
+D. Wierstra, S. Legg, and D. Hassabis, “Human-level control through
+deep reinforcement learning,” Nature, vol. 518, pp. 529–533, Feb. 2015.
+
+[35] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,”
+arXiv preprint arXiv:1412.69801, 2014.
+
+[36] S. Fujimoto, H. van Hoof, and D. Meger, “Addressing function approxi-
+mation error in actor-critic methods,” arXiv preprint arXiv:1802.09477,
+2018.
+
+[37] H. K. Khalil, Nonlinear Systems, 3rd ed. Prentice Hall, 2001.
+
+
+	I INTRODUCTION
+	II Problem formulation
+	III Model-Reference Reinforcement Learning Control
+	III-A Reinforcement learning
+
+	IV Deep Reinforcement Learning Control Design
+	IV-A Training setup
+
+	V Performance analysis
+	VI Simulation
+	VII Conclusions
+	References
+
