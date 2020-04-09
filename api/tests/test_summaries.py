@@ -36,7 +36,3 @@ def test_validity_check():
         summarizer.cleanup()
     
     assert bad_links == 5 # 5 bad links in the input file
-
-
-if __name__ == "__main__":
-    test_naive_pipeline()
