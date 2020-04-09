@@ -5,7 +5,6 @@ from tika import parser
 import re
 import heapq
 
-
 class PDFSummarizer():
     '''
     Summarizes a scholarly document in the form of a series of sentences.
@@ -27,15 +26,22 @@ class PDFSummarizer():
         else: #document is a pdf
             # download the file contents
             r = requests.get(self.file_url)
+            if r.headers['Content-Type'] != 'application/pdf':
+                # invalid file type
+                print("Invalid file url provided: not a PDF")
+                return 1
             
+            with open('./{0}'.format(self.file_name), 'wb') as f:
+                f.write(r.content)
+
             if (r.status_code == 200):
                 return 0
             else:
                 return 1
         
-    def delete_pdf(self):
+    def cleanup(self):
         '''
-        Delete the pdf that was downloaded
+        Delete the pdf that was downloaded.
         '''
         path = "./{0}".format(self.file_name)
         if os.path.isfile(path):
@@ -106,16 +112,20 @@ class PDFSummarizer():
             summary_list.append(abs_sentences[index])
         summary = '.'.join(summary_list)
 
-        print(summary + ".")
+        summary_response['content'] = summary + '.'
 
         return summary_response
 
-
-# https://arxiv.org/pdf/2003.13312.pdf
-
 def main():
-    summarizer = PDFSummarizer("https://arxiv.org/pdf/2003.13839.pdf")
+    summarizer = PDFSummarizer("https://arxiv.org/pdf/1901.00483.pdf")
     summary_dict = summarizer.naive_summarize()
+
+    if summary_dict['valid_file'] == 'n':
+        print("Invalid file")
+    else:
+        print(summary_dict['content'])
+
+    summarizer.cleanup()
     
 if __name__ == "__main__":
     main()
