@@ -44,19 +44,19 @@ function Home() {
             <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary />
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary />
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary />
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary />  
+            <Summary cards={info[0]}/>  
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary />
+            <Summary cards={info[0]}/>
           </Grid>
         </Grid>
       </div>
