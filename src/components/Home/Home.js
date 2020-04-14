@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import './Home.css';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
@@ -39,22 +39,22 @@ function Home() {
       <div style={{paddingLeft:'10%'}}>
         <Grid container spacing={4}>
           <Grid item xs={6} sm={6}>
-            <Summary/>
+            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>
+            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>
+            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>  
+            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>  
+            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>  
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>  
+            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
           </Grid>
         </Grid>
       </div>

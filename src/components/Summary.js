@@ -24,30 +24,40 @@ const useStyles = makeStyles({
   },
 });
 
-export default function SimpleCard() {
+
+const Summary = props => {
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
 
   return (
     <Card className={classes.root} style={{marginTop:50, textAlign:'left'}}>
       <CardContent>
         <Typography className={classes.title} color="textSecondary" gutterBottom>
-          4/05/20 12:00PM EST
+          {props.date} {props.time}
         </Typography>
         <Typography className={classes.pos} color="textSecondary">
-          Genre: Game Theory
+          Genre: {props.genre}
         </Typography>
         <Typography variant="h5" component="h2" style={{textDecorationLine: 'underline'}}>
-            Risk-Averse Equilibrium Analysis and Computation
+            {props.title}
         </Typography>
         <Typography variant="body2" component="p" style={{paddingTop: 10}}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore 
-            et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            {props.summary}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button href="https://arxiv.org/pdf/2004.02470.pdf" size="small">Learn More</Button>
+        <Button href={props.url} size="small">Learn More</Button>
       </CardActions>
     </Card>
   );
-}
+};
+
+Summary.defaultProps = {
+  date: '04/01/20',
+  time: '12:00PM EST',
+  genre: 'GENRE',
+  title: 'TITLE',
+  summary: 'SUMMARY',
+  url: 'https://www.google.com/'
+};
+
+export default Summary;
