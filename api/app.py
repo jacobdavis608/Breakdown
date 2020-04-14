@@ -1,15 +1,15 @@
 import time
-from flask import Flask, jsonify
+from flask import Flask, escape, request, make_response, jsonify
 from flask_pymongo import PyMongo
 
 app = Flask(__name__)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
 mongo = PyMongo(app)
 
-@app.route('/')
-def home():
-    return {}
-
-@app.route('/upload')
+@app.route('/upload', methods=['GET'])
 def upload():
-    return {}
+    
+    
+    
+    #if 'url' in request.args:
+    

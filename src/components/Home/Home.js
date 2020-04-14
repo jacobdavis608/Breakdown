@@ -44,19 +44,25 @@ function Home() {
             <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary cards={info[0]}/>
+            <Summary cards={info[1]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary cards={info[0]}/>
+            <Summary cards={info[2]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary cards={info[0]}/>
+            <Summary cards={info[3]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary cards={info[0]}/>  
+            <Summary cards={info[4]}/>  
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary cards={info[0]}/>
+            <Summary cards={info[5]}/>
+          </Grid>
+          <Grid item xs={6} sm={6}>
+            <Summary cards={info[6]}/>
+          </Grid>
+          <Grid item xs={6} sm={6}>
+            <Summary cards={info[7]}/>
           </Grid>
         </Grid>
       </div>

@@ -1,6 +1,7 @@
 import sys
 sys.path.append("..")
 from summarize import PDFSummarizer
+import json
 
 def test_naive_pipeline():
     articles = []
@@ -9,6 +10,7 @@ def test_naive_pipeline():
         articles = content.split('\n')
 
     successful_summaries = 0
+    summaries = {}
     for article_url in articles:
         summarizer = PDFSummarizer(article_url)
         try:
@@ -19,7 +21,11 @@ def test_naive_pipeline():
             summarizer.cleanup()
             continue
         summarizer.cleanup()
-    
+        summaries[article_url] = summary
+
+    with open("test_summaries.json", 'w') as fp:
+        json.dump(summaries, fp)
+
     assert successful_summaries == len(articles)
 
 def test_validity_check():
