@@ -1,0 +1,17 @@
+{
+    "users": {
+        "user0001":
+            {
+                "cards": [
+                    {
+                        "date": "04/05/20",
+                        "time": "12:34PM EST",
+                        "genre": "Game Theory",
+                        "title": "Risk-Averse Equilibrium Analysis and Computation",
+                        "summary": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                        "url": "https://arxiv.org/pdf/2004.02470.pdf"
+                    }
+                ]
+            }
+    }
+}

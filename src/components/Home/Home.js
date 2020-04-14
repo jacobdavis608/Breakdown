@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import './Home.css';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,11 +8,13 @@ import books from '../Images/books.jpg';
 import {Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Summary from '../Summary.js'
+import data from '../data.json'
 const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
   const classes = useStyles();
+  const info = data.users.user0001.cards
   return (
     <React.Fragment>
       <div className="middleSection"
@@ -39,22 +41,22 @@ function Home() {
       <div style={{paddingLeft:'10%'}}>
         <Grid container spacing={4}>
           <Grid item xs={6} sm={6}>
-            <Summary/>
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>  
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>  
+            <Summary cards={info[0]}/>  
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary/>  
+            <Summary cards={info[0]}/>
           </Grid>
         </Grid>
       </div>
