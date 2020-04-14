@@ -17,17 +17,19 @@ def home_page():
     return render_template("data.html", online_users=online_users)
 
 x = {
-    "userid": "",
-    "summaries": [
-        {"date":"",
-        "time":"",
-        "genre":"",
-        "title":"",
-        "summary":"",
-        "url":""
+        "userID1": {
+            "summaries": [
+                {
+                    "date":"",
+                    "time":"",
+                    "genre":"",
+                    "title":"",
+                    "summary":"",
+                    "url":""
+                }
+            ]
         }
-    ]
-}
+    }
 
 print(json.dumps(x))
 

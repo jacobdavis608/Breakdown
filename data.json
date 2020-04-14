@@ -1,17 +1,40 @@
 [
     {
-        "userID":"",
-        "summaries":
-        [
-            {
-                "date":"",
-                "time":"",
-                "genre":"",
-                "title":"",
-                "summary":"",
-                "url":""
-            }
-        ]
+        "userID1": {
+            "summaries": [
+                {
+                    "date":"",
+                    "time":"",
+                    "genre":"",
+                    "title":"",
+                    "summary":"",
+                    "url":""
+                }
+            ]
+        },
+        "userID2": {
+            "summaries": [
+                {
+                    "date":"",
+                    "time":"",
+                    "genre":"",
+                    "title":"",
+                    "summary":"",
+                    "url":""
+                }
+            ]
+        },
+        "userID3": {
+            "summaries": [
+                {
+                    "date":"",
+                    "time":"",
+                    "genre":"",
+                    "title":"",
+                    "summary":"",
+                    "url":""
+                }
+            ]
+        }
     }
 ]
- 
