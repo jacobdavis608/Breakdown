@@ -32,32 +32,33 @@ const Summary = props => {
     <Card className={classes.root} style={{marginTop:50, textAlign:'left'}}>
       <CardContent>
         <Typography className={classes.title} color="textSecondary" gutterBottom>
-          {props.date} {props.time}
+          {props.cards.date} {props.cards.time}
         </Typography>
         <Typography className={classes.pos} color="textSecondary">
-          Genre: {props.genre}
+          Genre: {props.cards.genre}
         </Typography>
         <Typography variant="h5" component="h2" style={{textDecorationLine: 'underline'}}>
-            {props.title}
+            {props.cards.title}
         </Typography>
         <Typography variant="body2" component="p" style={{paddingTop: 10}}>
-            {props.summary}
+            {props.cards.summary}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button href={props.url} size="small">Learn More</Button>
+        <Button href={props.cards.url} size="small">Learn More</Button>
       </CardActions>
     </Card>
   );
 };
 
 Summary.defaultProps = {
-  date: '04/01/20',
-  time: '12:00PM EST',
-  genre: 'GENRE',
-  title: 'TITLE',
-  summary: 'SUMMARY',
-  url: 'https://www.google.com/'
+  cards: {
+    "date": "04/05/20",
+    "time": "12:34PM EST",
+    "title": "Title",
+    "summary": "SUMMARY....",
+    "url": "www.google.com"
+  } 
 };
 
 export default Summary;

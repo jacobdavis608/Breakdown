@@ -8,11 +8,13 @@ import books from '../Images/books.jpg';
 import {Link} from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Summary from '../Summary.js'
+import data from '../data.json'
 const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
   const classes = useStyles();
+  const info = data.users.user0001.cards
   return (
     <React.Fragment>
       <div className="middleSection"
@@ -39,22 +41,22 @@ function Home() {
       <div style={{paddingLeft:'10%'}}>
         <Grid container spacing={4}>
           <Grid item xs={6} sm={6}>
-            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
+            <Summary cards={info[0]}/>
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
+            <Summary />
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
+            <Summary />
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
+            <Summary />
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>  
+            <Summary />  
           </Grid>
           <Grid item xs={6} sm={6}>
-            <Summary date='4/14/20' time='12:34PM EST' genre='Sports' title='ttrtr' summary='fdfdsfds' url='google.com'/>
+            <Summary />
           </Grid>
         </Grid>
       </div>
