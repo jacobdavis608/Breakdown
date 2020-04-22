@@ -6,7 +6,7 @@ client = MongoClient("mongodb+srv://breakdown:FixUp_11!@cluster0-ezpqi.mongodb.n
 
 db = client.test
 
-#create some random data where user's names are associated with their 
+#create some random data where user's names are associated with their
 # favorite animals, score (just a random int 0-100), money (0 - 10,000)
 
 def insert_random_people():
@@ -123,7 +123,6 @@ def get_data(): #return one person in the database
                         }
                     ]
         }
-
 
 def create_dummy_db():
     data = get_data()

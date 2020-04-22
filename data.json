@@ -1,7 +1,7 @@
 [
     {
-        "userID1": {
-            "summaries": [
+        "userID1": "0001",
+        "summaries": [
                 {
                     "date":"",
                     "time":"",
@@ -10,7 +10,7 @@
                     "summary":"",
                     "url":""
                 }
-            ]
+        ],
         },
         "userID2": {
             "summaries": [

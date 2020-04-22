@@ -12,6 +12,7 @@ import data from '../data.json'
 const useStyles = makeStyles((theme) => ({
 }));
 
+
 function Home() {
   const classes = useStyles();
   const info = data.users.user0001.cards
