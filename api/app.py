@@ -5,10 +5,8 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-#client = MongoClient("mongodb+srv://breakdown:FixUp_11!@cluster0-ezpqi.mongodb.net")
-#db = client.breakdown
-
-
+client = MongoClient("mongodb+srv://breakdown:FixUp_11!@cluster0-ezpqi.mongodb.net")
+db = client.breakdown
 
 # Figure out how to get a "session" going in flask
 # (maybe in another mongoDB collection) attach user number to username to user id
@@ -17,10 +15,19 @@ app = Flask(__name__)
 #@app.route('/login', methods=['POST'])
 #def login():    #url format: "https://localhost/display?user=0001&num_displayed=5"
 #    return
+#
+# Summary response format: 
+# {
+#    "valid" : 0 or 1,
+#    "summaries" : []           * Note: only present if valid == 1
+# }
+#
+#
+#
 
 @app.route('/')
 def home():
-    return "<h1>Test</h1>"
+    return "<h1>Welcome to Breakdown API</h1>"
 
 @app.route('/get_summaries', methods=['GET'])
 def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&start=0&end=10"
@@ -47,16 +54,20 @@ def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&sta
         return "<p>No valid summary range given</p>"
     
 
+    #get the user data
+    user_data = db.users.find_one({"id" : "001"})
 
+    #if user does not exist
+    if user_data == None:
+        return {"valid": 0} #
 
-
-    return "<h1>Breakdown API test</h1><p>Userid: {0}</p><p>Start: {1}</p><p>End: {2}</p>".format(user_id, start, end)
     
-    
-    #user_data = db.users.find_many({"id": "0001"}, 5).sort({x: -1})
+    #.sort({x: -1}) for getting latest, don't add this yet
     #for summary in user_data['summaries']:
     #    print(summary)
     #db.users.find_and_modify()
+
+    return "<h1>Breakdown API test</h1><p>Userid: {0}</p><p>Start: {1}</p><p>End: {2}</p>".format(user_id, start, end)
 
 if __name__ == "__main__":
     app.run()
