@@ -18,8 +18,7 @@ db = client.breakdown
 #
 # Summary response format: 
 # {
-#    "valid" : 0 or 1,
-#    "summaries" : []           * Note: only present if valid == 1
+#    "summaries" : []
 # }
 #
 #
@@ -46,22 +45,36 @@ def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&sta
     #error handling
     if (start == -1): 
         print("No summary range given")
-        return "<p>No valid summary range given</p>"
+        return {"summaries": []}
     elif (end == -1):
         print("No summary range given")
-        return "<p>No valid summary range given</p>"
+        return {"summaries": []}
     elif (start > end):
-        return "<p>No valid summary range given</p>"
-    
+        return {"summaries": []}
 
     #get the user data
-    user_data = db.users.find_one({"id" : "001"})
+    user_data = db.users.find_one({"id" : "0001"})
 
     #if user does not exist
     if user_data == None:
-        return {"valid": 0} #
+        return {"summaries": []} #if frontend receives empty array, print "No entries submitted"\
+    else:
+        num_summaries = len(user_data["summaries"])
+        if (end > num_summaries):
+            end = num_summaries
+        if (start < 0):
+            start = 0
 
-    
+        summaries = user_data["summaries"][num_summaries - end: num_summaries - start]
+        summaries.reverse() #put them in chronological order
+
+        response = {
+            "summaries": summaries
+        }
+
+        print(summaries)
+        return response
+
     #.sort({x: -1}) for getting latest, don't add this yet
     #for summary in user_data['summaries']:
     #    print(summary)
