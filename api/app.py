@@ -20,25 +20,24 @@ def home():
 @app.route('/get_summaries', methods=['GET'])  #TODO CHANGE THIS TO POST TO SECURE USERID parameter
 def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&start=0&end=10"
     user_id = "0000"
-    start = -1
-    end = -1
+    start = None
+    end = None
     if 'user' in request.args:
         user_id = request.args['user']
+    else:
+        return {"summaries": []}
     
     if 'start' in request.args:
         start = int(request.args['start'])
+    else:
+        return {"summaries": []}
         
     if 'end' in request.args:
         end = int(request.args['end'])
+    else:
+        return {"summaries": []}
 
-    #error handling
-    if (start == -1): 
-        print("No summary range given")
-        return {"summaries": []}
-    elif (end == -1):
-        print("No summary range given")
-        return {"summaries": []}
-    elif (start > end):
+    if (start > end):
         return {"summaries": []}
 
     #get the user data
@@ -53,6 +52,7 @@ def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&sta
             end = num_summaries
         if (start < 0):
             start = 0
+        
 
         summaries = user_data["summaries"][num_summaries - end: num_summaries - start]
         summaries.reverse() #put them in chronological order
