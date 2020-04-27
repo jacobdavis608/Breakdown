@@ -94,20 +94,23 @@ def summarize():   #url format: "https://localhost/summarize?user=0002&title&url
         return response
     
     if 'url' in request.args:
-        url = int(request.args['url'])
+        url = request.args['url']
     else:
         return response
     
     if 'title' in request.args:
-        title = int(request.args['title'])
+        title = request.args['title']
     else:
         return response
 
+    print("Params: ")
+    print(url)
     # Initialize the summarizer with the url provided
     try:
         summarizer = PDFSummarizer(url)
     except:
         return response
+
 
     # Summarize the article and get the summarizer result
     summary = summarizer.naive_summarize()
@@ -117,8 +120,7 @@ def summarize():   #url format: "https://localhost/summarize?user=0002&title&url
         summarizer.cleanup()
         return response
     else: #summary is valid, insert into database
-        date = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S %p"))
-        
+        date = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
         new_db_entry = {
             "date": date,
             "genre": "Miscellaneous",
@@ -147,4 +149,4 @@ def summarize():   #url format: "https://localhost/summarize?user=0002&title&url
     return response
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
