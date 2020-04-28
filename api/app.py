@@ -161,7 +161,6 @@ def summarize():
 
     return response
 
-
 @app.route('/remove_summary', methods=['GET'])
 def remove_summary():
     '''
