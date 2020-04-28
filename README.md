@@ -1,8 +1,6 @@
 # Breakdown
 Trim down the minor details to produce quick summaries of scholarly articles with Breakdown.
 
-
-# Breakdown Stack
 This web application uses React.js for frontend and Flask in Python 3 for the summarization api as well as database operations.
 
 ## Frontend: React.js
