@@ -1,57 +1,51 @@
 import React from 'react';
 import './App.css';
-// import { GoogleSignin, statusCodes } from 'react-native-google-signin';
+import ReactDOM from 'react-dom';
+import FacebookLogin from 'react-facebook-login';
 
-/*
+
 class Login extends React.Component {
   constructor(){
     super();
-    this.state={
+    this.state = {
       userInfo: {
 
       },
+      isLoggedIn: false
     };
+    this.responseFacebook = this.responseFacebook.bind(this);
+  }
+
+  responseFacebook(response) {
+    this.setState({
+      isLoggedIn: true
+    });
   }
 
   render(){
-    return (
-      <div>
-          <h1>Login Page</h1>
-      </div>
-    );
+    if (this.state.isLoggedIn){
+      return (
+        <div>
+            <h1>You are already logged in</h1>
+        </div>
+      );
+    }
+    else {
+      return (
+        <div>
+            <h1>Login Page</h1>
+            <FacebookLogin
+              appId="247286716513693"
+              fields="name,email,picture"
+              scope="public_profile"
+              callback={this.responseFacebook}
+            />
+        </div>
+      );
+    }
   }
-} */
-
-function Login(){
-  return (
-    <div>
-        <h1>Login Page</h1>
-    </div>
-  );
-}
+} 
 
 export default Login;
 
 
-// import statusCodes along with GoogleSignin
-
- 
-// Somewhere in your code
-/*
-signIn = async () => {
-  try {
-    await GoogleSignin.hasPlayServices();
-    const userInfo = await GoogleSignin.signIn();
-    this.setState({ userInfo });
-  } catch (error) {
-    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-      // user cancelled the login flow
-    } else if (error.code === statusCodes.IN_PROGRESS) {
-      // operation (f.e. sign in) is in progress already
-    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      // play services not available or outdated
-    } else {
-      // some other error happened
-    }
-  }
-}; */
