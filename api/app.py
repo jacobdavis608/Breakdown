@@ -31,7 +31,14 @@ def home():
     return "<h1>Welcome to Breakdown API</h1>"
 
 @app.route('/get_summaries', methods=['GET'])  #TODO CHANGE THIS TO POST TO SECURE USERID parameter
-def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&start=0&end=10"
+def get_summaries():
+    '''
+    Get the summaries in the range [start:end] from latest to earliest uploaded,
+    for the provided user id. Example web request:
+        https://localhost/get_summaries?user=0001&start=0&end=10
+    The above example fetches 10 summaries for the user_id 0001
+    '''
+    
     user_id = "0000"
     start = None
     end = None
@@ -78,7 +85,15 @@ def get_summaries(): #url format: "https://localhost/get_summaries?user=0001&sta
         return response
 
 @app.route('/summarize', methods=['GET'])
-def summarize():   #url format: "https://localhost/summarize?user=0002&title&url=blah blah blah"
+def summarize():
+    '''
+    Generate a new summary for the pdf at the supplied url, and store it in the database
+    with the provided title associated with the provided user_id. Example web request:
+        https://localhost/summarize?user=0002&title=TESTSUMMARY&url=https://arxiv.org/pdf/2004.05274.pdf
+    The above will summarize the article provided from Arxiv and insert the summary into the
+    database with the title TEST SUMMARY.
+    '''
+    
     #Parse URL arguments
     user_id = "0000"
     url = ""
@@ -103,8 +118,6 @@ def summarize():   #url format: "https://localhost/summarize?user=0002&title&url
     else:
         return response
 
-    print("Params: ")
-    print(url)
     # Initialize the summarizer with the url provided
     try:
         summarizer = PDFSummarizer(url)
@@ -147,6 +160,16 @@ def summarize():   #url format: "https://localhost/summarize?user=0002&title&url
         response['success'] = 1
 
     return response
+
+
+@app.route('/remove_summary', methods=['GET'])
+def remove_summary():
+    '''
+    Remove a user's summary from the database. Example web request:
+        https://localhost/remove_summary?user=0002&summary_id=23"
+    Remove the summary in the database for this user that has summary_id 23.
+    '''
+    return {}
 
 if __name__ == "__main__":
     app.run(debug=True)
