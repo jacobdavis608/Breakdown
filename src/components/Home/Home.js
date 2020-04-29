@@ -39,34 +39,6 @@ function Home() {
         </Button>
         </Box>
       </div>
-      <div style={{paddingLeft:'10%'}}>
-        <Grid container spacing={4}>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[0]}/>
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[1]}/>
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[2]}/>
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[3]}/>
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[4]}/>  
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[5]}/>
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[6]}/>
-          </Grid>
-          <Grid item xs={6} sm={6}>
-            <Summary cards={info[7]}/>
-          </Grid>
-        </Grid>
-      </div>
     </React.Fragment>
   );
 }
