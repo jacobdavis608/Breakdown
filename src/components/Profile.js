@@ -129,7 +129,7 @@ class Profile extends React.Component {
             onClick={() => this.decrementRange()}
             startIcon={<ArrowLeftIcon />}
           />
-          <p style={{fontSize: 24, color: "white"}}>Summaries {this.state.start} - {(this.state.end > this.state.total_user_summaries)? this.state.total_user_summaries: this.state.end}</p>
+          <p style={{fontSize: 24, color: "white"}}>Summaries {this.state.start+1} - {(this.state.end > this.state.total_user_summaries)? this.state.total_user_summaries: this.state.end}</p>
           <Button
             variant="light"
             color="white"
