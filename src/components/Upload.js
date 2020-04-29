@@ -38,7 +38,7 @@ class Upload extends React.Component {
 
   submitted(){
     var userID = cookies.get('userID');
-    var api_url = `http://127.0.0.1:5000/summarize?user=${userID}&title=${this.state.title}&url=${this.state.url}`
+    var api_url = `http://ec2-18-204-19-57.compute-1.amazonaws.com/summarize?user=${userID}&title=${this.state.title}&url=${this.state.url}`
     console.log(api_url);
     fetch(api_url)
         .then((res) => res.json())

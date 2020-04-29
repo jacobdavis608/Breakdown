@@ -70,7 +70,7 @@ class Profile extends React.Component {
 
   fetchSummaries(){
     var userID = cookies.get('userID');
-    var api_url = `http://127.0.0.1:5000/get_summaries?user=${userID}&start=${this.state.start}&end=${this.state.end}`
+    var api_url = `http://ec2-18-204-19-57.compute-1.amazonaws.com/get_summaries?user=${userID}&start=${this.state.start}&end=${this.state.end}`
     fetch(api_url)
         .then((res) => res.json())
         .then((resJson) => {
@@ -109,7 +109,6 @@ class Profile extends React.Component {
     }
   }
 
-
   render(){
     const loggedIn = cookies.get('isLoggedIn');
     if (loggedIn == 'yes'){
@@ -130,7 +129,7 @@ class Profile extends React.Component {
             onClick={() => this.decrementRange()}
             startIcon={<ArrowLeftIcon />}
           />
-          <p style={{fontSize: 24, color: "white"}}>Summaries {this.state.start} - {this.state.end}</p>
+          <p style={{fontSize: 24, color: "white"}}>Summaries {this.state.start} - {(this.state.end > this.state.total_user_summaries)? this.state.total_user_summaries: this.state.end}</p>
           <Button
             variant="light"
             color="white"
