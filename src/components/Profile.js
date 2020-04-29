@@ -13,56 +13,71 @@ class Profile extends React.Component {
     this.state = {
       start: 0,
       end: 10,
+      summaries: [],
+      loading: false
     }
-    this.getSummaries = this.getSummaries.bind(this);
+    this.fetchSummaries = this.fetchSummaries.bind(this);
+    this.loadSummaries = this.loadSummaries.bind(this);
+    this.renderSummaries = this.renderSummaries.bind(this);
   }
-  getSummaries(){
-    return(
-      <div>
-        <h1>
-          Profile Page
-        </h1>
-        <p>
-          You are logged in.
-        </p>
-      </div>
-    )
-    /* ADD SOMETHING LIKE THIS INSTEAD BUT mapped from the a list of summaries given by response from fetch
+
+  componentDidMount(){
+    const loggedIn = cookies.get('isLoggedIn');
+    if (loggedIn == 'yes'){
+      this.loadSummaries() //load the user's summaries
+    }
+  }
+  
+  renderSummaries(){
+    if (this.state.loading){
       return (
-      <React.Fragment>
-        <div>
-          <h1>Profile Page</h1>
-        </div>
         <div style={{paddingLeft:'10%'}}>
-          <Grid container spacing={4}>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[0]}/>
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[1]}/>
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[2]}/>
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[3]}/>
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[4]}/>  
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[5]}/>
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[6]}/>
-            </Grid>
-            <Grid item xs={6} sm={6}>
-              <Summary cards={info[7]}/>
-            </Grid>
-          </Grid> 
+          <h1>
+          Profile Page
+          </h1>
+          <p>
+            Loading summaries...
+          </p>
         </div>
-      </React.Fragment>
-    */
+      );
+    }
+    else {
+      return (
+        <div style={{paddingLeft:'10%'}}>
+          <h1>
+          Profile Page
+          </h1>
+          <Grid container spacing={4}>
+            {this.state.summaries.map(summary => (
+              <Grid item xs={6} sm={6}>
+                <Summary cards={summary}/>
+              </Grid>
+            ))}
+          </Grid>
+        </div>
+      );
+    }
+  }
+
+  fetchSummaries(){
+    var userID = cookies.get('userID');
+    userID = '0001';
+    var api_url = `http://127.0.0.1:5000/get_summaries?user=${userID}&start=${this.state.start}&end=${this.state.end}`
+    fetch(api_url)
+        .then((res) => res.json())
+        .then((resJson) => {
+          this.setState({
+            summaries: resJson.summaries,
+            loading: false
+          })
+        }).catch((error)=>console.log(error));
+  }
+
+  loadSummaries(){
+    //indicate that the summaries are loading, define callback to be the actual fetch
+    this.setState({
+      loading: true
+    }, () => this.fetchSummaries());
   }
   
   render(){
@@ -70,7 +85,7 @@ class Profile extends React.Component {
     if (loggedIn == 'yes'){
       return(
         <React.Fragment>
-          {this.getSummaries()}
+          {this.renderSummaries()}
         </React.Fragment>
       )
     }
