@@ -124,27 +124,25 @@ class Profile extends React.Component {
           </div>
           <div>
           
-          
-          
           {this.renderSummaries()}
 
-          <div style={{paddingLeft:'10%', paddingRight: '10%', textAlign: 'center'}}>
-          <Grid container spacing={3}>
-            <Grid container item xs>
+          <div style={{minWidth: '700px', marginLeft: '28vw'}}>
+          <Grid  container spacing={1}>
+            <Grid container item xs={2}>
               <Button
-              variant="light"
-              color="white"
+              variant="text"
+              color="default"
               onClick={() => this.decrementRange()}
               startIcon={<ArrowLeftIcon />}
               />
             </Grid>
-            <Grid container item xs={6}>
-            <p style={{fontSize: 24, color: "white"}}>Summaries {this.state.start+1} - {(this.state.end > this.state.total_user_summaries)? this.state.total_user_summaries: this.state.end}</p>
+            <Grid container item xs={4}>
+            <p style={{fontSize: 20, color: "white"}}>Summaries {this.state.start+1} - {(this.state.end > this.state.total_user_summaries)? this.state.total_user_summaries: this.state.end}</p>
             </Grid> 
-            <Grid container item xs>
+            <Grid container item xs={2}>
               <Button
-              variant="light"
-              color="white"
+              variant="text"
+              color="default"
               onClick={() => this.incrementRange()}
               startIcon={<ArrowRightIcon />}
               /> 
