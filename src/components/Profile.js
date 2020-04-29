@@ -5,8 +5,6 @@ import Grid from '@material-ui/core/Grid';
 import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
-
-
 class Profile extends React.Component {
   constructor(){
     super();
@@ -42,6 +40,18 @@ class Profile extends React.Component {
       );
     }
     else {
+      if (this.state.summaries.length == 0){
+        return (
+          <div style={{paddingLeft:'10%'}}>
+            <h1>
+            Profile Page
+            </h1>
+            <p>
+              Navigate to the Upload page to start summarizing!
+            </p>
+          </div>
+        );
+      }
       return (
         <div style={{paddingLeft:'10%'}}>
           <h1>
@@ -61,7 +71,6 @@ class Profile extends React.Component {
 
   fetchSummaries(){
     var userID = cookies.get('userID');
-    userID = '0001';
     var api_url = `http://127.0.0.1:5000/get_summaries?user=${userID}&start=${this.state.start}&end=${this.state.end}`
     fetch(api_url)
         .then((res) => res.json())
