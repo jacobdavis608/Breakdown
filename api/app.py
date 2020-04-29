@@ -3,9 +3,10 @@ import datetime
 from flask import Flask, escape, request, make_response, jsonify
 from pymongo import MongoClient
 from summarize import PDFSummarizer
-
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 client = MongoClient("mongodb+srv://breakdown:FixUp_11!@cluster0-ezpqi.mongodb.net")
 db = client.breakdown
@@ -82,7 +83,7 @@ def get_summaries():
             "summaries": summaries,
             "total_summaries": num_summaries
         }
-        return response
+        return jsonify(response)
 
 @app.route('/summarize', methods=['GET'])
 def summarize():
@@ -106,23 +107,23 @@ def summarize():
     if 'user' in request.args:
         user_id = request.args['user']
     else:
-        return response
+        return jsonify(response)
     
     if 'url' in request.args:
         url = request.args['url']
     else:
-        return response
+        return jsonify(response)
     
     if 'title' in request.args:
         title = request.args['title']
     else:
-        return response
+        return jsonify(response)
 
     # Initialize the summarizer with the url provided
     try:
         summarizer = PDFSummarizer(url)
     except:
-        return response
+        return jsonify(response)
 
 
     # Summarize the article and get the summarizer result
@@ -131,7 +132,7 @@ def summarize():
     # Check whether the file was valid
     if summary['valid_file'] == 'n':
         summarizer.cleanup()
-        return response
+        return jsonify(response)
     else: #summary is valid, insert into database
         date = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
         new_db_entry = {
@@ -159,7 +160,7 @@ def summarize():
         db.users.update({"id": user_id}, {'$push' : {'summaries': new_db_entry}})
         response['success'] = 1
 
-    return response
+    return jsonify(response)
 
 @app.route('/remove_summary', methods=['GET'])
 def remove_summary():
@@ -168,7 +169,7 @@ def remove_summary():
         https://localhost/remove_summary?user=0002&summary_id=23"
     Remove the summary in the database for this user that has summary_id 23.
     '''
-    return {}
+    return jsonify({})
 
 if __name__ == "__main__":
     app.run(debug=True)

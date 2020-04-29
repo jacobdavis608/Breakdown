@@ -32,7 +32,7 @@ const Summary = props => {
     <Card className={classes.root} style={{marginTop:50, textAlign:'left'}}>
       <CardContent>
         <Typography className={classes.title} color="textSecondary" gutterBottom>
-          {props.cards.date} {props.cards.time}
+          {props.cards.date}
         </Typography>
         <Typography className={classes.pos} color="textSecondary">
           Genre: {props.cards.genre}
