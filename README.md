@@ -27,12 +27,6 @@ This part of the api creates an instance of PDFSummarizer and runs the `naive_su
 For more information, see the [PDFSummarizer](###PDFSummarizer) section.
 
 
-### API: Remove Summary
-Example request format: 
-`https://localhost/get_summaries?user={USER_ID}&summary_id={SUMMARY_ID}`
-Remove the summary with {SUMMARY_ID} from the {USER_ID}'s summaries from the database.
-
-
 ### Database
 The database is hosted with Atlas cloud through MongoDB and is connected to the flask application through the PyMongo client in the `pymongo` package in Python. This allows simple connectivity to the database, including insert, delete, collection creation, and more. It allows for all of the backend control of the database, and isolates the database from the backend endpoint. 
 
