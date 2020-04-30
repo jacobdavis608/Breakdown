@@ -34,7 +34,6 @@ const Navigation = () => {
           </Typography>
           <Button component={Link} to="/" color="inherit">Home</Button>
           <Button component={Link} to="/upload" color="inherit">Upload</Button>
-          <Button component={Link} to="/trending" color="inherit">Trending</Button>
           <Button component={Link} to="/profile" color="inherit">Profile</Button>  
           <Button component={Link} to="/login" color="inherit">Login</Button>
         </Toolbar>
