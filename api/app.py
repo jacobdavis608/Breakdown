@@ -21,7 +21,6 @@ db = client.breakdown
 # New summary response format:
 #
 # {
-#   "valid" : 0 or 1 #indicating whether url provided was valid
 #   "success" : 0 or 1 #indicating whether the summarizer was successful
 # }
 #
@@ -31,7 +30,7 @@ db = client.breakdown
 def home():
     return "<h1>Welcome to Breakdown API</h1>"
 
-@app.route('/get_summaries', methods=['GET'])  #TODO CHANGE THIS TO POST TO SECURE USERID parameter
+@app.route('/get_summaries', methods=['GET']) 
 def get_summaries():
     '''
     Get the summaries in the range [start:end] from latest to earliest uploaded,
@@ -161,15 +160,6 @@ def summarize():
         response['success'] = 1
 
     return jsonify(response)
-
-@app.route('/remove_summary', methods=['GET'])
-def remove_summary():
-    '''
-    Remove a user's summary from the database. Example web request:
-        https://localhost/remove_summary?user=0002&summary_id=23"
-    Remove the summary in the database for this user that has summary_id 23.
-    '''
-    return jsonify({})
 
 if __name__ == "__main__":
     app.run(debug=True)
