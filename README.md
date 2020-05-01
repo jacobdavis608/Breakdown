@@ -5,22 +5,22 @@ This web application uses React.js for frontend and Flask in Python 3 for the su
 
 ## How To Use Instruction
 
-# Home
+### Home
 The user will first be shown the home page where they can upload a pdf if they are already logged in.
 
-# Login
+### Login
 1. Once you are the on the website, the first thing the user needs to do is login.
 2. The login process is pretty simple as the user will need to login using their fb account
 3. Although there are a few different pages, since we have cookies you will logged in throughout your session
 4. Even if the user logs out and logs back in, their uploaded pdfs will remain in their account
 
-# Upload
+### Upload
 1. To being uploading pdfs, the user needs to click on the 'Upload' tab
 2. The user needs to find a scholarly article with a URL that ends in '.pdf', or else the program will not function
 3. Then the user needs to type in the title of the article or title name of their choosing
 4. Once the user clicks submit, it will take a few seconds for it to upload. If it uploads it will show on your profile page, if not the file that was attempted to be uploaded was faulty or inserted incorrectly
 
-# Profile
+### Profile
 1. When the user goes to the Profile page, they will see all of their uploaded pdfs
 2. They will be able to see the abract on each of the pdf's display cards and if they want to read more they can simply click on the display card. This will send will then go to the article URL
 3. Only 10 pdf display cards will show per page and so the user can choose to go back and forth between pages
