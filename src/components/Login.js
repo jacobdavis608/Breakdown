@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import ReactDOM from 'react-dom';
+import trinity from './Images/trinityCollege.jpg';
 //import Button from '@material-ui/core/Button';
 import FacebookLogin from 'react-facebook-login';
 import Cookies from 'universal-cookie';
@@ -37,8 +37,12 @@ class Login extends React.Component {
   render(){
     if (cookies.get('isLoggedIn') == 'yes'){
       return (
-        <div>
-            <h1>You are logged in</h1>
+        <div style={{
+          backgroundImage:`url(${trinity})`,
+          height: '800px',
+          paddingTop: '200px'
+        }}>
+            <h1 style={{color:'white'}}>You are logged in!</h1>
             <button onClick={this.logout}>
               Logout
             </button>
@@ -47,7 +51,10 @@ class Login extends React.Component {
     }
     else{
       return (
-        <div>
+        <div style={{
+          backgroundImage:`url(${trinity})`,
+          height: '800px'
+        }}>
             <h1>Login Page</h1>
               <FacebookLogin
                 appId="247286716513693"

@@ -6,16 +6,13 @@ import Box from '@material-ui/core/Box';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import books from '../Images/books.jpg';
 import {Link} from 'react-router-dom';
-import Grid from '@material-ui/core/Grid';
-import Summary from '../Summary.js'
-import data from '../data.json'
+
 const useStyles = makeStyles((theme) => ({
 }));
 
 
 function Home() {
   const classes = useStyles();
-  const info = data.users.user0001.cards
   return (
     <React.Fragment>
       <div className="middleSection"
