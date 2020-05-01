@@ -3,7 +3,7 @@ Trim down the minor details to produce quick summaries of scholarly articles wit
 
 This web application uses React.js for frontend and Flask in Python 3 for the summarization api as well as database operations.
 
-## How To Use Instruction
+## How To Use Instructions
 
 ### Home
 The user will first be shown the home page where they can upload a pdf if they are already logged in.
